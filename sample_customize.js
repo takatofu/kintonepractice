@@ -1,19 +1,38 @@
-//アプリIDを取得
-var appID = kintone.app.getId();
 
-// ログインユーザ情報
-var user = kintone.getLoginUser();
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+(function() {
+    'use strict';
 
-//クエリ文の設定
-var qryInfo = 'ユーザー選択 in (LOGINUSER())';  
-
-//リクエストを行う
-kintone.api('/k/v1/records', 'GET', { app: appID, query: qryInfo}, function(resp) {
-    if (resp['records'].length > 0) {
-        var msg = "";
-        for (var i = 0; i < resp['records'].length; i++) {
-            msg += "・ " + resp['records'][i]['文字列__1行_']['value'] + "\n";
+    kintone.events.on('app.record.index.show', function(event) {
+        if (!event.size) {
+            return;
         }
-        alert(user.name + "が担当している会社\n\n" + msg);
-    }
-});
+
+        var records = event.records;
+        var signalColorParts = kintone.app.getFieldElements('信号の色');
+        for (var i = 0; i < records.length; i++) {
+            // 値の取得
+            var color = records[i].信号の色.value;
+
+            // DOM要素の取得
+            var part = signalColorParts[i];
+
+            // 値ごとに表示分け
+            if (color === '赤') {
+                part.style.fontWeight = 'bold';
+                part.style.color = '#ffffff';
+                part.style.backgroundColor = '#ff0000';
+
+            } else if (color === '青') {
+                part.style.fontWeight = 'bold';
+                part.style.color = '#ffffff';
+                part.style.backgroundColor = '#0000ff';
+
+            } else if (color === '黄色') {
+                part.style.fontWeight = 'bold';
+                part.style.color = '#ffffff';
+                part.style.backgroundColor = '#ffd700';
+            }
+        }
+    });
+})();
